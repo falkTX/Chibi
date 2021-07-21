@@ -50,8 +50,11 @@ int main(int argc, char *argv[])
         {
             // we got some args, lets try them
             // TODO
-            qFatal("Not implemented yet");
-            return 1;
+            qWarning("CLI argument received, assumed to be VST2 path");
+
+            btype = CarlaBackend::BINARY_NATIVE;
+            ptype = CarlaBackend::PLUGIN_VST2;
+            filename = args[1];
         }
         else
         {

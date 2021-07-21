@@ -74,7 +74,10 @@ void ChibiEmbedWidget::setup(void* const ptr)
 
 void ChibiEmbedWidget::resizeView(int width, int height)
 {
-    XResizeWindow(QX11Info::display(), pData->window, width, height);
+    if (pData->window)
+    {
+        XResizeWindow(QX11Info::display(), pData->window, width, height);
+    }
 }
 
 QSize ChibiEmbedWidget::sizeHint() const

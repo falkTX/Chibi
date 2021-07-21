@@ -38,6 +38,8 @@ ChibiWindow::ChibiWindow(BinaryType btype,
     const QString properName = QString("Chibi%1%2").arg(name[0].isDigit() ? "-" : "").arg(name);
     setWindowTitle(properName);
 
+    carla_set_engine_option(handle, CarlaBackend::ENGINE_OPTION_OSC_ENABLED, 0, nullptr);
+
     {
         const QPalette pal(palette());
 
@@ -67,9 +69,13 @@ ChibiWindow::ChibiWindow(BinaryType btype,
     // NOTE: this assumes JACK driver for now
     CARLA_SAFE_ASSERT_RETURN(carla_engine_init(handle, "JACK", "Chibi"),);
 
-    CARLA_SAFE_ASSERT_RETURN(carla_add_plugin(handle, btype, ptype,
-                                              filename.toUtf8(), properName.toUtf8(), label.toUtf8(),
-                                              uniqueId, nullptr, 0x0),);
+    if (! carla_add_plugin(handle, btype, ptype, 
+                           filename.toUtf8(), properName.toUtf8(), label.toUtf8(),
+                           uniqueId, nullptr, 0x0))
+    {
+        carla_stderr2("Failed to add plugin, error was: %s", carla_get_last_error(handle));
+        return;
+    }
 
     void* const ptr = carla_embed_custom_ui(handle, 0, (void*)(intptr_t)ui->embedwidget->winId());
     ui->embedwidget->setup(ptr);
@@ -123,7 +129,7 @@ void ChibiWindow::engineCallback(const EngineCallbackOpcode action, const uint p
     case CarlaBackend::ENGINE_CALLBACK_EMBED_UI_RESIZED:
         carla_stdout("resized to %i %i", value1, value2);
         // resize(value1, value2);
-        // setFixedSize(value1, value2);
+        setFixedSize(value1, value2);
         // ui->embedwidget->setFixedSize(value1, value2);
         // ui->embedwidget->resizeView(value1, value2);
         // adjustSize();
