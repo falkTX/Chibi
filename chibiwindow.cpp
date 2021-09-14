@@ -129,7 +129,9 @@ void ChibiWindow::engineCallback(const EngineCallbackOpcode action, const uint p
     case CarlaBackend::ENGINE_CALLBACK_EMBED_UI_RESIZED:
         carla_stdout("resized to %i %i", value1, value2);
         // resize(value1, value2);
-        setFixedSize(value1, value2);
+        ui->embedwidget->setFixedSize(value1, value2);
+        adjustSize();
+        setFixedSize(width(), height());
         // ui->embedwidget->setFixedSize(value1, value2);
         // ui->embedwidget->resizeView(value1, value2);
         // adjustSize();
