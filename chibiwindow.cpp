@@ -1,6 +1,6 @@
 /*
  * Chibi - Carla's mini-host plugin loader
- * Copyright (C) 2020 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2020-2023 Filipe Coelho <falktx@falktx.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any purpose with
  * or without fee is hereby granted, provided that the above copyright notice and this
@@ -20,14 +20,11 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-#include "carla/CarlaUtils.hpp"
+#include "CarlaUtils.hpp"
 
-ChibiWindow::ChibiWindow(BinaryType btype,
-                         PluginType ptype,
-                         const QString& filename,
-                         const QString& name,
-                         const QString& label,
-                         int64_t uniqueId)
+CARLA_BACKEND_USE_NAMESPACE;
+
+ChibiWindow::ChibiWindow(const PluginListDialogResults* const res)
     : QMainWindow(nullptr)
     , ui(new Ui::ChibiWindow)
     , handle(carla_standalone_host_init())
@@ -35,10 +32,13 @@ ChibiWindow::ChibiWindow(BinaryType btype,
 {
     ui->setupUi(this);
 
-    const QString properName = QString("Chibi%1%2").arg(name[0].isDigit() ? "-" : "").arg(name);
+    const QString properName = QString::fromUtf8("Chibi - %1").arg(res->name);
     setWindowTitle(properName);
 
-    carla_set_engine_option(handle, CarlaBackend::ENGINE_OPTION_OSC_ENABLED, 0, nullptr);
+    carla_set_engine_option(handle, ENGINE_OPTION_OSC_ENABLED, 0, nullptr);
+    carla_set_engine_option(handle, ENGINE_OPTION_PATH_BINARIES, 0, "/usr/lib/carla");
+    carla_set_engine_option(handle, ENGINE_OPTION_PATH_RESOURCES, 0, "/usr/share/carla/resources");
+
 
     {
         const QPalette pal(palette());
@@ -53,25 +53,28 @@ ChibiWindow::ChibiWindow(BinaryType btype,
         bgColorValue = ((bgColorValue & 0xffffff) << 8) | (bgColorValue >> 24);
         fgColorValue = ((fgColorValue & 0xffffff) << 8) | (fgColorValue >> 24);
 
-        carla_set_engine_option(handle, CarlaBackend::ENGINE_OPTION_FRONTEND_BACKGROUND_COLOR, bgColorValue, nullptr);
-        carla_set_engine_option(handle, CarlaBackend::ENGINE_OPTION_FRONTEND_FOREGROUND_COLOR, fgColorValue, nullptr);
+        carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_BACKGROUND_COLOR, bgColorValue, nullptr);
+        carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_FOREGROUND_COLOR, fgColorValue, nullptr);
     }
 
-    carla_set_engine_option(handle, CarlaBackend::ENGINE_OPTION_FRONTEND_UI_SCALE, static_cast<int>(devicePixelRatioF() * 1000), "");
+    const int uiScale = static_cast<int>(devicePixelRatioF() * 1000);
+    carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_UI_SCALE, uiScale, "");
 
     carla_set_engine_callback(handle, _engine_callback, this);
     carla_set_file_callback(handle, _file_callback, this);
 
     // TODO set frontendWinId in case we cannot embed
 
-    carla_set_engine_option(handle, CarlaBackend::ENGINE_OPTION_PREFER_UI_BRIDGES, 0, nullptr);
+    carla_set_engine_option(handle, ENGINE_OPTION_PREFER_UI_BRIDGES, 0, nullptr);
 
     // NOTE: this assumes JACK driver for now
     CARLA_SAFE_ASSERT_RETURN(carla_engine_init(handle, "JACK", "Chibi"),);
 
-    if (! carla_add_plugin(handle, btype, ptype, 
-                           filename.toUtf8(), properName.toUtf8(), label.toUtf8(),
-                           uniqueId, nullptr, 0x0))
+    if (! carla_add_plugin(handle,
+                           static_cast<BinaryType>(res->build),
+                           static_cast<PluginType>(res->type),
+                           res->filename, res->name, res->label,
+                           res->uniqueId, nullptr, PLUGIN_OPTIONS_NULL))
     {
         carla_stderr2("Failed to add plugin, error was: %s", carla_get_last_error(handle));
         return;
@@ -89,7 +92,10 @@ ChibiWindow::ChibiWindow(BinaryType btype,
 ChibiWindow::~ChibiWindow()
 {
     if (carla_is_engine_running(handle))
+    {
+        carla_show_custom_ui(handle, 0, false);
         carla_engine_close(handle);
+    }
 
     delete ui;
 }
@@ -117,16 +123,16 @@ void ChibiWindow::engineCallback(const EngineCallbackOpcode action, const uint p
 {
     switch (action)
     {
-    case CarlaBackend::ENGINE_CALLBACK_IDLE:
+    case ENGINE_CALLBACK_IDLE:
         qApp->processEvents();
         break;
-    case CarlaBackend::ENGINE_CALLBACK_INFO:
+    case ENGINE_CALLBACK_INFO:
         QMessageBox::information(this, "Information", valueStr);
         break;
-    case CarlaBackend::ENGINE_CALLBACK_ERROR:
+    case ENGINE_CALLBACK_ERROR:
         QMessageBox::critical(this, "Error", valueStr);
         break;
-    case CarlaBackend::ENGINE_CALLBACK_EMBED_UI_RESIZED:
+    case ENGINE_CALLBACK_EMBED_UI_RESIZED:
         carla_stdout("resized to %i %i", value1, value2);
         // resize(value1, value2);
         ui->embedwidget->setFixedSize(value1, value2);
@@ -148,10 +154,10 @@ const char* ChibiWindow::fileCallback(const FileCallbackOpcode action, const boo
 
     switch (action)
     {
-    case CarlaBackend::FILE_CALLBACK_OPEN:
+    case FILE_CALLBACK_OPEN:
         ret = QFileDialog::getOpenFileName(this, title, "", filter, nullptr, option);
         break;
-    case CarlaBackend::FILE_CALLBACK_SAVE:
+    case FILE_CALLBACK_SAVE:
         ret = QFileDialog::getSaveFileName(this, title, "", filter, nullptr, option);
         break;
     default:

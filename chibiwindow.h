@@ -1,6 +1,6 @@
 /*
  * Chibi - Carla's mini-host plugin loader
- * Copyright (C) 2020 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2020-2023 Filipe Coelho <falktx@falktx.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any purpose with
  * or without fee is hereby granted, provided that the above copyright notice and this
@@ -20,6 +20,7 @@
 #include <QMainWindow>
 
 #include "CarlaHost.h"
+#include "CarlaFrontend.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ChibiWindow; }
@@ -30,12 +31,7 @@ class ChibiWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    ChibiWindow(CarlaBackend::BinaryType btype,
-                CarlaBackend::PluginType ptype,
-                const QString& filename,
-                const QString& name,
-                const QString& label,
-                int64_t uniqueId);
+    ChibiWindow(const PluginListDialogResults* res);
     ~ChibiWindow();
 
 protected:

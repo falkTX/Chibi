@@ -12,7 +12,8 @@ struct ChibiEmbedWidget::PrivateData
     ::Window window;
 
     PrivateData()
-        : window(0) {}
+        : wasResized(false),
+          window(0) {}
 };
 
 ChibiEmbedWidget::ChibiEmbedWidget(QWidget* const parent)
