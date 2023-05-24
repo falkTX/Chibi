@@ -19,11 +19,6 @@
 
 #include <QApplication>
 
-// TODO
-#include "CarlaUtils.h"
-uint carla_get_cached_plugin_count(PluginType, const char*) { return 0; }
-const CarlaCachedPluginInfo* carla_get_cached_plugin_info(PluginType, uint) { return nullptr; }
-
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);

@@ -167,6 +167,8 @@ const char* ChibiWindow::fileCallback(const FileCallbackOpcode action, const boo
     if (ret.isEmpty())
         return nullptr;
 
-    static QByteArray sRet = ret.toUtf8();
-    return sRet;
+    static QByteArray sRet;
+    sRet = ret.toUtf8();
+
+    return sRet.constData();
 }
