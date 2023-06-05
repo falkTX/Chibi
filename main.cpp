@@ -31,6 +31,10 @@ int main(int argc, char *argv[])
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
     QApplication::setAttribute(Qt::AA_X11InitThreads);
 
+   #ifdef CARLA_OS_WIN
+    QApplication::addLibraryPath(QString::fromUtf8(carla_get_library_folder()));
+   #endif
+
     QApplication app(argc, argv);
     app.setApplicationName("Chibi");
     app.setApplicationVersion(CARLA_VERSION_STRING);

@@ -118,9 +118,13 @@ jobs:
         shell: bash
         run: |
           source PawPaw/local.env win32
-          mkdir Chibi-win32
+          mkdir -p Chibi-win32/{imageformats,iconengines,platforms,styles}
           mv build/*.exe build/carla/cmake/carla-discovery-*.exe build/carla/cmake/*.dll Chibi-win32/
-          cp ${PAWPAW_PREFIX}/bin/Qt5{Core,Gui,Widgets}.dll Chibi-win32/
+          cp ${PAWPAW_PREFIX}/bin/Qt5{Core,Gui,Svg,Widgets}.dll Chibi-win32/
+          cp ${PAWPAW_PREFIX}/lib/qt5/plugins/imageformats/qsvg.dll Chibi-win32/imageformats/
+          cp ${PAWPAW_PREFIX}/lib/qt5/plugins/iconengines/qsvgicon.dll Chibi-win32/iconengines/
+          cp ${PAWPAW_PREFIX}/lib/qt5/plugins/platforms/qwindows.dll Chibi-win32/platforms/
+          cp ${PAWPAW_PREFIX}/lib/qt5/plugins/styles/qwindowsvistastyle.dll Chibi-win32/styles/
           zip -r -9 Chibi-win32.zip Chibi-win32
       - uses: actions/upload-artifact@v3
         with:
@@ -194,9 +198,13 @@ jobs:
         shell: bash
         run: |
           source PawPaw/local.env win64
-          mkdir Chibi-win64
+          mkdir -p Chibi-win64/{imageformats,iconengines,platforms,styles}
           mv build/*.exe build/carla/cmake/carla-discovery-*.exe build/carla/cmake/*.dll Chibi-win64/
-          cp ${PAWPAW_PREFIX}/bin/Qt5{Core,Gui,Widgets}.dll Chibi-win64/
+          cp ${PAWPAW_PREFIX}/bin/Qt5{Core,Gui,Svg,Widgets}.dll Chibi-win64/
+          cp ${PAWPAW_PREFIX}/lib/qt5/plugins/imageformats/qsvg.dll Chibi-win64/imageformats/
+          cp ${PAWPAW_PREFIX}/lib/qt5/plugins/iconengines/qsvgicon.dll Chibi-win64/iconengines/
+          cp ${PAWPAW_PREFIX}/lib/qt5/plugins/platforms/qwindows.dll Chibi-win64/platforms/
+          cp ${PAWPAW_PREFIX}/lib/qt5/plugins/styles/qwindowsvistastyle.dll Chibi-win64/styles/
           zip -r -9 Chibi-win64.zip Chibi-win64
       - uses: actions/upload-artifact@v3
         with:
