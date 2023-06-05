@@ -20,9 +20,12 @@ set_property(GLOBAL PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 find_package(PkgConfig REQUIRED)
 find_package(Qt5 COMPONENTS REQUIRED Core Widgets)
 
-if(NOT (APPLE OR WIN32))
+if(NOT (APPLE OR MINGW OR WIN32))
   find_package(X11 REQUIRED)
   find_package(Qt5 COMPONENTS REQUIRED X11Extras)
+else()
+  set(X11_FOUND FALSE)
+  mark_as_advanced(X11_FOUND)
 endif()
 
 #######################################################################################################################
