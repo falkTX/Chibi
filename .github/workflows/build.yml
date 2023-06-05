@@ -107,7 +107,8 @@ jobs:
         run: |
           source PawPaw/local.env win32
           alias
-          cmake -S . -B build
+          # cmake -S . -B build
+          cmake -DCMAKE_CROSSCOMPILING=ON -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_SYSTEM_PROCESSOR=i686 -DCMAKE_AR=/usr/bin/i686-w64-mingw32-ar -DCMAKE_C_COMPILER_AR=/usr/bin/i686-w64-mingw32-ar -DCMAKE_CXX_COMPILER_AR=/usr/bin/i686-w64-mingw32-ar -DCMAKE_RANLIB=/usr/bin/i686-w64-mingw32-ranlib -DCMAKE_C_COMPILER_RANLIB=/usr/bin/i686-w64-mingw32-ranlib -DCMAKE_CXX_COMPILER_RANLIB=/usr/bin/i686-w64-mingw32-ranlib -DCMAKE_CROSSCOMPILING_EMULATOR=wine -DCMAKE_RC_COMPILER=i686-w64-mingw32-windres -S . -B build
           $(which cmake) --build build -j $(nproc)
       - name: Create zip package
         if: steps.cache.outputs.cache-hit == 'true'

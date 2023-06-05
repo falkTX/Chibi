@@ -81,3 +81,9 @@ set_target_properties(Chibi
     AUTOUIC ON
     AUTORCC ON
 )
+
+if(APPLE)
+  set_source_files_properties(
+    chibiembedwidget.cpp
+    PROPERTIES COMPILE_FLAGS -ObjC++)
+endif()
