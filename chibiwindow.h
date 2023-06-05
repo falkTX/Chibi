@@ -22,21 +22,24 @@
 #include "CarlaHost.h"
 #include "CarlaFrontend.h"
 
+#include "chibiembedwidget.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class ChibiWindow; }
 QT_END_NAMESPACE
 
-class ChibiWindow : public QMainWindow
+class ChibiWindow : public QMainWindow, public ChibiEmbedWidget::Callback
 {
     Q_OBJECT
 
 public:
-    ChibiWindow(CarlaHostHandle handle, const PluginListDialogResults* res);
+    ChibiWindow(CarlaHostHandle handle, const char* name);
     ~ChibiWindow();
 
 protected:
     void closeEvent(QCloseEvent* event) override;
     void timerEvent(QTimerEvent* event) override;
+    void pluginWindowResized(uint width, uint height) override;
 
 private:
     Ui::ChibiWindow* const ui;

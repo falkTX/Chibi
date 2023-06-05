@@ -52,18 +52,28 @@ int main(int argc, char *argv[])
 
     const PluginListDialogResults* const res = carla_frontend_createAndExecPluginListDialog(nullptr);
 
+    int r = 1;
+
     if (res == nullptr)
+        goto cleanup;
+
+    if (! carla_add_plugin(handle,
+                           static_cast<BinaryType>(res->build),
+                           static_cast<PluginType>(res->type),
+                           res->filename, res->name, res->label,
+                           res->uniqueId, nullptr, PLUGIN_OPTIONS_NULL))
     {
-        if (carla_is_engine_running(handle))
-            carla_engine_close(handle);
-        return 1;
+        QMessageBox::critical(nullptr, "Error", carla_get_last_error(handle));
+        goto cleanup;
     }
 
-    ChibiWindow w(handle, res);
-    w.show();
+    {
+        ChibiWindow w(handle, res->name);
+        w.show();
+        r = app.exec();
+    }
 
-    const int r = app.exec();
-
+cleanup:
     if (carla_is_engine_running(handle))
         carla_engine_close(handle);
 

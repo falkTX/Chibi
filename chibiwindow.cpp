@@ -24,7 +24,7 @@
 
 CARLA_BACKEND_USE_NAMESPACE;
 
-ChibiWindow::ChibiWindow(const CarlaHostHandle h, const PluginListDialogResults* const res)
+ChibiWindow::ChibiWindow(const CarlaHostHandle h, const char* const name)
     : QMainWindow(nullptr)
     , ui(new Ui::ChibiWindow)
     , handle(h)
@@ -32,7 +32,7 @@ ChibiWindow::ChibiWindow(const CarlaHostHandle h, const PluginListDialogResults*
 {
     ui->setupUi(this);
 
-    const QString properName = QString::fromUtf8("Chibi - %1").arg(res->name);
+    const QString properName = QString::fromUtf8("Chibi - %1").arg(name);
     setWindowTitle(properName);
 
     {
@@ -58,23 +58,13 @@ ChibiWindow::ChibiWindow(const CarlaHostHandle h, const PluginListDialogResults*
     carla_set_engine_callback(handle, _engine_callback, this);
     carla_set_file_callback(handle, _file_callback, this);
 
-    if (! carla_add_plugin(handle,
-                           static_cast<BinaryType>(res->build),
-                           static_cast<PluginType>(res->type),
-                           res->filename, res->name, res->label,
-                           res->uniqueId, nullptr, PLUGIN_OPTIONS_NULL))
-    {
-        carla_stderr2("Failed to add plugin, error was: %s", carla_get_last_error(handle));
-        return;
-    }
-
-    void* const ptr = carla_embed_custom_ui(handle, 0, (void*)(intptr_t)ui->embedwidget->winId());
+    void* const ptr = carla_embed_custom_ui(handle, 0, ui->embedwidget->prepare(this));
     ui->embedwidget->setup(ptr);
 
-    if (ui->embedwidget->wasResized())
-        resize(ui->embedwidget->size());
-    else
-        adjustSize();
+//     if (ui->embedwidget->wasResized())
+//         resize(ui->embedwidget->size());
+//     else
+    adjustSize();
 }
 
 ChibiWindow::~ChibiWindow()
@@ -97,10 +87,22 @@ void ChibiWindow::closeEvent(QCloseEvent* const event)
 
 void ChibiWindow::timerEvent(QTimerEvent* const event)
 {
-    if (carla_is_engine_running(handle))
-        carla_engine_idle(handle);
+    if (event->timerId() == idleTimer)
+    {
+        if (carla_is_engine_running(handle))
+            carla_engine_idle(handle);
+
+        ui->embedwidget->idle();
+    }
 
     QMainWindow::timerEvent(event);
+}
+
+void ChibiWindow::pluginWindowResized(const uint /*width*/, const uint /*height*/)
+{
+    adjustSize();
+    setFixedSize(width(), height());
+//     setFixedSize(width, height);
 }
 
 void ChibiWindow::engineCallback(const EngineCallbackOpcode action, const uint pluginId,

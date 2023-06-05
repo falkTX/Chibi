@@ -1,6 +1,6 @@
 /*
  * Chibi - Carla's mini-host plugin loader
- * Copyright (C) 2020 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2020-2023 Filipe Coelho <falktx@falktx.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any purpose with
  * or without fee is hereby granted, provided that the above copyright notice and this
@@ -24,15 +24,21 @@ class ChibiEmbedWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ChibiEmbedWidget(QWidget* parent);
+    struct Callback {
+        virtual ~Callback() {}
+        virtual void pluginWindowResized(uint width, uint height) = 0;
+    };
+
+    explicit ChibiEmbedWidget(QWidget*);
     ~ChibiEmbedWidget() override;
 
     QSize sizeHint() const override;
     QSize minimumSizeHint() const override;
 
-    bool canEmbed() const;
-    bool wasResized() const;
+//     bool wasResized() const;
 
+    void* prepare(Callback* callback);
+    void idle();
     void setup(void* ptr);
     void resizeView(int width, int height);
 
