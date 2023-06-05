@@ -35,7 +35,9 @@ jobs:
         run: |
           git clone https://github.com/DISTRHO/PawPaw.git
           git -C PawPaw checkout ${{ env.PAWPAW_VERSION }}
-          ./PawPaw/bootstrap-carla.sh macos-universal && ./PawPaw/.cleanup.sh macos-universal
+          ./PawPaw/bootstrap-plugins.sh macos-universal
+          ./PawPaw/bootstrap-qt.sh macos-universal
+          ./PawPaw/.cleanup.sh macos-universal
       - name: Build macOS universal
         shell: bash
         run: |
@@ -93,7 +95,9 @@ jobs:
         run: |
           git clone https://github.com/DISTRHO/PawPaw.git
           git -C PawPaw checkout ${{ env.PAWPAW_VERSION }}
-          ./PawPaw/bootstrap-carla.sh win32 && ./PawPaw/.cleanup.sh win32
+          ./PawPaw/bootstrap-plugins.sh win32
+          ./PawPaw/bootstrap-qt.sh win32
+          ./PawPaw/.cleanup.sh win32
       - name: Build win32 cross-compiled
         shell: bash
         run: |
@@ -159,7 +163,9 @@ jobs:
         run: |
           git clone https://github.com/DISTRHO/PawPaw.git
           git -C PawPaw checkout ${{ env.PAWPAW_VERSION }}
-          ./PawPaw/bootstrap-carla.sh win64 && ./PawPaw/.cleanup.sh win64
+          ./PawPaw/bootstrap-plugins.sh win64
+          ./PawPaw/bootstrap-qt.sh win64
+          ./PawPaw/.cleanup.sh win64
       - name: Build win64 cross-compiled
         shell: bash
         run: |
