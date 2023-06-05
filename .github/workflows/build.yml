@@ -11,7 +11,7 @@ on:
 env:
   CACHE_VERSION: 1
   PAWPAW_SKIP_LTO: 1
-  PAWPAW_VERSION: cd7b760d6a32ecad263b112c12be8a306ed1e89c
+  PAWPAW_VERSION: 89010e314aac3d6c7de467250310c1d5ef1e1926
 
 jobs:
   # macOS native universal build
