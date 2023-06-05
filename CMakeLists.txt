@@ -75,6 +75,7 @@ target_sources(Chibi
     carla/source/frontend/pluginlist/pluginlistdialog.cpp
     carla/source/frontend/pluginlist/pluginrefreshdialog.hpp
     carla/resources/resources.qrc
+    $<$<BOOL:${WIN32}>:carla/resources/ico/carla.rc>
 )
 
 set_target_properties(Chibi
