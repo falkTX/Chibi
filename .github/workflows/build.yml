@@ -106,6 +106,7 @@ jobs:
         shell: bash
         run: |
           source PawPaw/local.env win32
+          alias
           cmake -S . -B build
           $(which cmake) --build build -j $(nproc)
       - name: Create zip package
@@ -177,6 +178,7 @@ jobs:
         shell: bash
         run: |
           source PawPaw/local.env win64
+          alias
           cmake -S . -B build
           $(which cmake) --build build -j $(nproc)
       - name: Create zip package
