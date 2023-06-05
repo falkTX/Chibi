@@ -24,7 +24,17 @@ CARLA_BACKEND_USE_NAMESPACE;
 
 int main(int argc, char *argv[])
 {
+   #ifdef CARLA_OS_MAC
+    QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
+   #endif
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    QApplication::setAttribute(Qt::AA_X11InitThreads);
+
     QApplication app(argc, argv);
+    app.setApplicationName("Chibi");
+    app.setApplicationVersion(CARLA_VERSION_STRING);
+    app.setOrganizationName("falkTX");
 
     const CarlaHostHandle handle = carla_standalone_host_init();
 

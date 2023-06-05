@@ -38,6 +38,7 @@ add_executable(Chibi)
 target_compile_definitions(Chibi
   PRIVATE
     $<$<BOOL:${X11_FOUND}>:HAVE_X11>
+    BUILDING_CARLA
     CARLA_FRONTEND_ONLY_EMBEDDABLE_PLUGINS
     #CARLA_UTILS_USE_QT
 )
@@ -56,8 +57,8 @@ target_link_libraries(Chibi
   PRIVATE
     carla::standalone
     carla::utils
-    Qt::Core
-    Qt::Widgets
+    Qt5::Core
+    Qt5::Widgets
     $<$<BOOL:${X11_FOUND}>:Qt::X11Extras>
     $<$<BOOL:${X11_FOUND}>:X11>
 )
