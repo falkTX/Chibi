@@ -188,8 +188,8 @@ struct ChibiEmbedWidget::PrivateData
                 height = rect.bottom - rect.top;
             }
 
-            if (lookingForChildren)
-                d_stdout("child window bounds %i %i | offset %u %u", width, height, xOffset, yOffset);
+//             if (lookingForChildren)
+//                 d_stdout("child window bounds %i %i | offset %u %u", width, height, xOffset, yOffset);
 
             if (width > 1 && height > 1)
             {

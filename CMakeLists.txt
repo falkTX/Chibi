@@ -61,6 +61,7 @@ target_link_libraries(Chibi
     carla::utils
     Qt5::Core
     Qt5::Widgets
+    $<$<BOOL:${APPLE}>:$<LINK_LIBRARY:FRAMEWORK,Cocoa.framework>>
     $<$<BOOL:${X11_FOUND}>:Qt::X11Extras>
     $<$<BOOL:${X11_FOUND}>:X11>
 )
