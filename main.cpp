@@ -17,19 +17,41 @@
 #include "chibiwindow.h"
 #include "CarlaFrontend.h"
 
-#include <QApplication>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMessageBox>
+
+CARLA_BACKEND_USE_NAMESPACE;
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+    const CarlaHostHandle handle = carla_standalone_host_init();
+
+    if (handle == nullptr || !carla_engine_init(handle, "JACK", "Chibi"))
+    {
+        QMessageBox::critical(nullptr, "Error", carla_get_last_error(handle));
+        return 1;
+    }
+
+    carla_set_engine_option(handle, ENGINE_OPTION_OSC_ENABLED, 0, nullptr);
+    carla_set_engine_option(handle, ENGINE_OPTION_PATH_BINARIES, 0, carla_get_library_folder());
+    carla_set_engine_option(handle, ENGINE_OPTION_PREFER_UI_BRIDGES, 0, nullptr);
+
+    // TODO check CLI args and use it instead of plugin list dialog
 
     const PluginListDialogResults* const res = carla_frontend_createAndExecPluginListDialog(nullptr);
 
     if (res == nullptr)
         return 1;
 
-    ChibiWindow w(res);
+    ChibiWindow w(handle, res);
     w.show();
 
-    return app.exec();
+    const int r = app.exec();
+
+    if (carla_is_engine_running(handle))
+        carla_engine_close(handle);
+
+    return r;
 }

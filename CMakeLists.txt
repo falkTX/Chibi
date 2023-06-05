@@ -38,6 +38,7 @@ add_executable(Chibi)
 target_compile_definitions(Chibi
   PRIVATE
     $<$<BOOL:${X11_FOUND}>:HAVE_X11>
+    CARLA_FRONTEND_ONLY_EMBEDDABLE_PLUGINS
     #CARLA_UTILS_USE_QT
 )
 
@@ -68,6 +69,7 @@ target_sources(Chibi
     chibiwindow.cpp
     carla/source/frontend/carla_frontend.cpp
     carla/source/frontend/pluginlist/pluginlistdialog.cpp
+    carla/source/frontend/pluginlist/pluginrefreshdialog.hpp
 )
 
 set_target_properties(Chibi

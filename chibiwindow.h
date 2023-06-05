@@ -31,7 +31,7 @@ class ChibiWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    ChibiWindow(const PluginListDialogResults* res);
+    ChibiWindow(CarlaHostHandle handle, const PluginListDialogResults* res);
     ~ChibiWindow();
 
 protected:

@@ -17,28 +17,23 @@
 #include "chibiwindow.h"
 #include "ui_chibiwindow.h"
 
-#include <QFileDialog>
-#include <QMessageBox>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMessageBox>
 
 #include "CarlaUtils.hpp"
 
 CARLA_BACKEND_USE_NAMESPACE;
 
-ChibiWindow::ChibiWindow(const PluginListDialogResults* const res)
+ChibiWindow::ChibiWindow(const CarlaHostHandle h, const PluginListDialogResults* const res)
     : QMainWindow(nullptr)
     , ui(new Ui::ChibiWindow)
-    , handle(carla_standalone_host_init())
+    , handle(h)
     , idleTimer(startTimer(30))
 {
     ui->setupUi(this);
 
     const QString properName = QString::fromUtf8("Chibi - %1").arg(res->name);
     setWindowTitle(properName);
-
-    carla_set_engine_option(handle, ENGINE_OPTION_OSC_ENABLED, 0, nullptr);
-    carla_set_engine_option(handle, ENGINE_OPTION_PATH_BINARIES, 0, "/usr/lib/carla");
-    carla_set_engine_option(handle, ENGINE_OPTION_PATH_RESOURCES, 0, "/usr/share/carla/resources");
-
 
     {
         const QPalette pal(palette());
@@ -63,13 +58,6 @@ ChibiWindow::ChibiWindow(const PluginListDialogResults* const res)
     carla_set_engine_callback(handle, _engine_callback, this);
     carla_set_file_callback(handle, _file_callback, this);
 
-    // TODO set frontendWinId in case we cannot embed
-
-    carla_set_engine_option(handle, ENGINE_OPTION_PREFER_UI_BRIDGES, 0, nullptr);
-
-    // NOTE: this assumes JACK driver for now
-    CARLA_SAFE_ASSERT_RETURN(carla_engine_init(handle, "JACK", "Chibi"),);
-
     if (! carla_add_plugin(handle,
                            static_cast<BinaryType>(res->build),
                            static_cast<PluginType>(res->type),
@@ -92,10 +80,7 @@ ChibiWindow::ChibiWindow(const PluginListDialogResults* const res)
 ChibiWindow::~ChibiWindow()
 {
     if (carla_is_engine_running(handle))
-    {
         carla_show_custom_ui(handle, 0, false);
-        carla_engine_close(handle);
-    }
 
     delete ui;
 }
