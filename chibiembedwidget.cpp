@@ -27,8 +27,8 @@ static int gErrorHandler(Display*, XErrorEvent*)
 struct ChibiEmbedWidget::PrivateData
 {
     QWidget* const widget;
-//     void* const ourWindowPtr;
     const uintptr_t ourWindowId;
+    void* const ourWindowPtr;
 
    #if defined(Q_OS_MAC)
     NSView* const view;
@@ -47,6 +47,7 @@ struct ChibiEmbedWidget::PrivateData
     PrivateData(QWidget* const w)
         : widget(w),
           ourWindowId(w->winId()),
+          ourWindowPtr((void*)ourWindowId),
          #if defined(Q_OS_MAC)
           view([[NSView new]retain]),
           subview(nullptr),
@@ -80,16 +81,17 @@ struct ChibiEmbedWidget::PrivateData
     {
         callback = cb;
         lookingForChildren = true;
+
        #if defined(Q_OS_MAC)
         subview = nullptr;
         return view;
        #elif defined(Q_OS_WINDOWS)
         pluginWindow = nullptr;
-        return ourWindowPtr;
        #else
         pluginWindow = 0;
-        return (void*)ourWindowId;
        #endif
+
+        return ourWindowPtr;
     }
 
     bool hide()
@@ -132,7 +134,7 @@ struct ChibiEmbedWidget::PrivateData
             }
            #elif defined(Q_OS_WINDOWS)
             if (pluginWindow == nullptr)
-                pluginWindow = FindWindowExA((::HWND)ourWindowPtr, nullptr, nullptr, nullptr);
+                pluginWindow = FindWindowExA((HWND)ourWindowPtr, nullptr, nullptr, nullptr);
            #else
             if (pluginWindow == 0)
             {
