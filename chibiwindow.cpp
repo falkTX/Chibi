@@ -79,9 +79,6 @@ ChibiWindow::ChibiWindow(const CarlaHostHandle h, const PluginListDialogResults*
 
 ChibiWindow::~ChibiWindow()
 {
-    if (carla_is_engine_running(handle))
-        carla_show_custom_ui(handle, 0, false);
-
     delete ui;
 }
 
@@ -90,7 +87,10 @@ void ChibiWindow::closeEvent(QCloseEvent* const event)
     killTimer(idleTimer);
 
     if (carla_is_engine_running(handle))
+    {
+        carla_show_custom_ui(handle, 0, false);
         carla_set_engine_about_to_close(handle);
+    }
 
     QMainWindow::closeEvent(event);
 }

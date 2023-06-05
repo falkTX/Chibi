@@ -43,7 +43,11 @@ int main(int argc, char *argv[])
     const PluginListDialogResults* const res = carla_frontend_createAndExecPluginListDialog(nullptr);
 
     if (res == nullptr)
+    {
+        if (carla_is_engine_running(handle))
+            carla_engine_close(handle);
         return 1;
+    }
 
     ChibiWindow w(handle, res);
     w.show();
