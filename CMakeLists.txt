@@ -105,9 +105,6 @@ if(APPLE)
     COMMAND ln -sf cmake "${CMAKE_CURRENT_BINARY_DIR}/carla/lib"
   )
   add_custom_command(TARGET Chibi POST_BUILD
-    COMMAND macdeployqt $<TARGET_BUNDLE_DIR:Chibi>
-  )
-  add_custom_command(TARGET Chibi POST_BUILD
     COMMAND mkdir -p "$<TARGET_BUNDLE_DIR:Chibi>/Contents/PlugIns/platforms" "$<TARGET_BUNDLE_DIR:Chibi>/Contents/PlugIns/styles"
   )
   add_custom_command(TARGET Chibi POST_BUILD
@@ -115,5 +112,8 @@ if(APPLE)
   )
   add_custom_command(TARGET Chibi POST_BUILD
     COMMAND cp "${QtPluginsDir}/styles/libqmacstyle.dylib" "$<TARGET_BUNDLE_DIR:Chibi>/Contents/PlugIns/styles/"
+  )
+  add_custom_command(TARGET Chibi POST_BUILD
+    COMMAND macdeployqt $<TARGET_BUNDLE_DIR:Chibi> -dmg
   )
 endif()
