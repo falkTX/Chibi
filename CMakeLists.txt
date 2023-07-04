@@ -114,6 +114,11 @@ if(APPLE)
     COMMAND cp "${QtPluginsDir}/styles/libqmacstyle.dylib" "$<TARGET_BUNDLE_DIR:Chibi>/Contents/PlugIns/styles/"
   )
   add_custom_command(TARGET Chibi POST_BUILD
+    COMMAND cp "${CMAKE_CURRENT_BINARY_DIR}/carla/lib/carla-bridge-native"
+               "${CMAKE_CURRENT_BINARY_DIR}/carla/lib/carla-discovery-native"
+               "$<TARGET_BUNDLE_DIR:Chibi>/Contents/MacOS/"
+  )
+  add_custom_command(TARGET Chibi POST_BUILD
     COMMAND macdeployqt $<TARGET_BUNDLE_DIR:Chibi> -dmg
   )
 endif()

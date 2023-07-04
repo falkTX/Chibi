@@ -20,6 +20,29 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMessageBox>
 
+#ifdef CARLA_OS_MAC
+# include <dlfcn.h>
+// override for custom location
+const char* carla_get_library_folder()
+{
+    struct _ {
+        static std::string getExecutableDir()
+        {
+            Dl_info dlinfo = {};
+            dladdr(reinterpret_cast<const void*>(::carla_get_library_folder), &dlinfo);
+
+            if (const char* const lastsep = std::strrchr(dlinfo.dli_fname, '/'))
+                return std::string(dlinfo.dli_fname, lastsep - dlinfo.dli_fname);
+
+            return {};
+        }
+    };
+
+    static std::string path(_::getExecutableDir());
+    return path.c_str();
+}
+#endif
+
 CARLA_BACKEND_USE_NAMESPACE;
 
 int main(int argc, char *argv[])

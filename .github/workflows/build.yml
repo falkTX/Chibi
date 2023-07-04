@@ -14,7 +14,6 @@ env:
   PAWPAW_VERSION: 70160711d2efec286d417b63a073a8f2012346f6
 
 jobs:
-  # macOS native universal build
   macos_universal:
     runs-on: macos-11
     steps:
