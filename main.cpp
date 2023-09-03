@@ -72,21 +72,36 @@ int main(int argc, char *argv[])
 
     const CarlaHostHandle handle = carla_standalone_host_init();
 
-    if (handle == nullptr || !carla_engine_init(handle, "JACK", "Chibi"))
+    if (handle == nullptr)
+    {
+        QMessageBox::critical(nullptr, "Error", carla_get_last_error(nullptr));
+        return 1;
+    }
+
+    carla_set_engine_option(handle, ENGINE_OPTION_OSC_ENABLED, 0, nullptr);
+    carla_set_engine_option(handle, ENGINE_OPTION_OSC_PORT_TCP, -1, nullptr);
+    carla_set_engine_option(handle, ENGINE_OPTION_OSC_PORT_UDP, -1, nullptr);
+    carla_set_engine_option(handle, ENGINE_OPTION_PATH_BINARIES, 0, carla_get_library_folder());
+    carla_set_engine_option(handle, ENGINE_OPTION_PREFER_UI_BRIDGES, 0, nullptr);
+
+    if (!carla_engine_init(handle, "JACK", "Chibi"))
     {
         QMessageBox::critical(nullptr, "Error", carla_get_last_error(handle));
         return 1;
     }
 
-    carla_set_engine_option(handle, ENGINE_OPTION_OSC_ENABLED, 0, nullptr);
-    carla_set_engine_option(handle, ENGINE_OPTION_PATH_BINARIES, 0, carla_get_library_folder());
-    carla_set_engine_option(handle, ENGINE_OPTION_PREFER_UI_BRIDGES, 0, nullptr);
-
     // TODO check CLI args and use it instead of plugin list dialog
 
-    const PluginListDialogResults* const res = carla_frontend_createAndExecPluginListDialog(nullptr);
-
     int r = 1;
+
+    const HostSettings hostSettings = {};
+    PluginListDialog* const dialog = carla_frontend_createPluginListDialog(nullptr, &hostSettings);
+    const PluginListDialogResults* res;
+
+    if (dialog == nullptr)
+        goto cleanup;
+
+    res = carla_frontend_execPluginListDialog(dialog);
 
     if (res == nullptr)
         goto cleanup;
