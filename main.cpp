@@ -47,12 +47,19 @@ CARLA_BACKEND_USE_NAMESPACE;
 
 int main(int argc, char *argv[])
 {
+   #ifdef HAVE_X11
+    setenv("QT_QPA_PLATFORM", "xcb", 0);
+   #endif
    #ifdef CARLA_OS_MAC
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
    #endif
+   #if QT_VERSION < 0x60000
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+   #endif
+   #if QT_VERSION < 0x50e00
     QApplication::setAttribute(Qt::AA_X11InitThreads);
+   #endif
 
    #ifdef CARLA_OS_WIN
     QApplication::addLibraryPath(QString::fromUtf8(carla_get_library_folder()));
